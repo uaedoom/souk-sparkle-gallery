@@ -49,41 +49,60 @@ export default function Admin() {
         // Set admin as logged in via localStorage (legacy)
         localStorage.setItem("adminLoggedIn", "true");
         
-        // Also sign in with Supabase for RLS access
-        await supabase.auth.signInWithPassword({
-          email: ADMIN_EMAIL,
-          password: ADMIN_PASSWORD
-        });
+        // Try to sign in with Supabase for RLS access, but don't block if it fails
+        try {
+          await supabase.auth.signInWithPassword({
+            email: ADMIN_EMAIL,
+            password: ADMIN_PASSWORD
+          });
+        } catch (supabaseError) {
+          console.error("Non-critical Supabase auth error:", supabaseError);
+          // Continue anyway since we're using localStorage for admin auth
+        }
         
         toast({
           title: "Admin login successful",
           description: "Welcome to the admin dashboard",
         });
         
-        navigate("/admin/dashboard");
+        // Small delay to ensure localStorage is set before navigating
+        setTimeout(() => {
+          navigate("/admin/dashboard");
+        }, 100);
       } else {
         // Try to sign in user with Supabase (for regular users who are traders)
-        const { error } = await supabase.auth.signInWithPassword({
-          email: username, // Assuming username is an email
-          password: password
-        });
-        
-        if (error) {
-          toast({
-            title: "Access denied",
-            description: "Invalid credentials",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Login successful",
-            description: "Welcome to the admin dashboard",
+        try {
+          const { error } = await supabase.auth.signInWithPassword({
+            email: username, // Assuming username is an email
+            password: password
           });
           
-          navigate("/admin/dashboard");
+          if (error) {
+            toast({
+              title: "Access denied",
+              description: "Invalid credentials",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Login successful",
+              description: "Welcome to the admin dashboard",
+            });
+            
+            setTimeout(() => {
+              navigate("/admin/dashboard");
+            }, 100);
+          }
+        } catch (supabaseError) {
+          toast({
+            title: "Authentication error",
+            description: "Failed to authenticate with Supabase",
+            variant: "destructive",
+          });
         }
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Error signing in",
         description: "An error occurred while trying to sign in",

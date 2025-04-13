@@ -14,34 +14,39 @@ const PrivateAdminRoute = ({ children }: PrivateAdminRouteProps) => {
   
   useEffect(() => {
     const checkAuth = async () => {
-      // First check localStorage admin login (for backward compatibility)
-      const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
-      
-      if (isAdminLoggedIn) {
-        // If admin is logged in via localStorage, also sign in with Supabase
-        // This ensures RLS policies will work
-        try {
-          const { error } = await supabase.auth.signInWithPassword({
-            email: 'admin@souksparkle.com',
-            password: 'admin',
-          });
+      try {
+        // First check localStorage admin login (for backward compatibility)
+        const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+        
+        if (isAdminLoggedIn) {
+          // If using localStorage auth, immediately mark as authorized
+          setIsAuthorized(true);
           
-          if (!error) {
+          // Also try to sign in with Supabase for RLS policies, but don't block on this
+          try {
+            await supabase.auth.signInWithPassword({
+              email: 'admin@souksparkle.com',
+              password: 'admin',
+            });
+          } catch (supabaseError) {
+            console.error("Non-critical Supabase auth error:", supabaseError);
+            // Continue anyway since we're using localStorage
+          }
+        } else {
+          // Check if user is authenticated with Supabase
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            // User is authenticated with Supabase, mark as authorized
             setIsAuthorized(true);
           }
-        } catch (error) {
-          console.error("Error signing in admin with Supabase:", error);
         }
-      } else {
-        // Check if user is authenticated with Supabase
-        const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          // User is authenticated with Supabase, mark as authorized
-          setIsAuthorized(true);
-        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+        // In case of any error, we default to not authorized
+      } finally {
+        // Always set loading to false, regardless of outcome
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
     
     checkAuth();
