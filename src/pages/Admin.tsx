@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, User, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import AdminLoginHelp from "@/components/admin/AdminLoginHelp";
+import { resetAuthState } from "@/utils/authUtils";
 
 // Hardcoded admin credentials
 const ADMIN_USERNAME = "admin";
@@ -22,21 +24,29 @@ export default function Admin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      // Check if admin is already logged in via localStorage (legacy)
-      const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
-      
-      // Check if user is authenticated with Supabase
-      const { data } = await supabase.auth.getSession();
-      
-      if (isAdminLoggedIn || data.session) {
-        navigate("/admin/dashboard");
+    // Add a small delay before checking auth to ensure any previous operations finish
+    const timer = setTimeout(async () => {
+      try {
+        // Check if admin is already logged in via localStorage (legacy)
+        const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+        
+        // Check if user is authenticated with Supabase
+        const { data } = await supabase.auth.getSession();
+        
+        if (isAdminLoggedIn || data.session) {
+          console.log("Admin already logged in, redirecting to dashboard");
+          navigate("/admin/dashboard");
+        } else {
+          console.log("Admin not logged in, staying on login page");
+        }
+      } catch (error) {
+        console.error("Error checking auth status:", error);
+      } finally {
+        setCheckingSession(false);
       }
-      
-      setCheckingSession(false);
-    };
+    }, 300);
     
-    checkAuth();
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -44,31 +54,37 @@ export default function Admin() {
     setLoading(true);
     
     try {
+      // Reset any previous auth state to avoid conflicts
+      await resetAuthState();
+      
       // Simple credential check for admin
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        console.log("Admin credentials verified");
+        
         // Set admin as logged in via localStorage (legacy)
         localStorage.setItem("adminLoggedIn", "true");
-        
-        // Try to sign in with Supabase for RLS access, but don't block if it fails
-        try {
-          await supabase.auth.signInWithPassword({
-            email: ADMIN_EMAIL,
-            password: ADMIN_PASSWORD
-          });
-        } catch (supabaseError) {
-          console.error("Non-critical Supabase auth error:", supabaseError);
-          // Continue anyway since we're using localStorage for admin auth
-        }
         
         toast({
           title: "Admin login successful",
           description: "Welcome to the admin dashboard",
         });
         
-        // Small delay to ensure localStorage is set before navigating
+        // Try to sign in with Supabase for RLS access, run in background
+        supabase.auth.signInWithPassword({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        }).then(() => {
+          console.log("Supabase admin auth successful");
+        }).catch(error => {
+          console.error("Non-critical Supabase auth error:", error);
+          // Continue anyway since we're using localStorage for admin auth
+        });
+        
+        // Increased delay to ensure localStorage is set before navigation
         setTimeout(() => {
+          console.log("Navigating to admin dashboard");
           navigate("/admin/dashboard");
-        }, 100);
+        }, 1000);
       } else {
         // Try to sign in user with Supabase (for regular users who are traders)
         try {
@@ -185,6 +201,9 @@ export default function Admin() {
               Main Site
             </a>
           </p>
+          <div className="mt-2">
+            <AdminLoginHelp />
+          </div>
         </div>
       </div>
     </div>

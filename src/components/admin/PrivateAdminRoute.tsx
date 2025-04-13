@@ -19,14 +19,20 @@ const PrivateAdminRoute = ({ children }: PrivateAdminRouteProps) => {
         const isAdminLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
         
         if (isAdminLoggedIn) {
+          console.log("Admin logged in via localStorage");
           // If using localStorage auth, immediately mark as authorized
           setIsAuthorized(true);
           
           // Also try to sign in with Supabase for RLS policies, but don't block on this
           try {
-            await supabase.auth.signInWithPassword({
+            // Don't await here, just attempt the sign-in in the background
+            supabase.auth.signInWithPassword({
               email: 'admin@souksparkle.com',
               password: 'admin',
+            }).then(() => {
+              console.log("Supabase admin login attempted");
+            }).catch(err => {
+              console.error("Non-critical Supabase auth error:", err);
             });
           } catch (supabaseError) {
             console.error("Non-critical Supabase auth error:", supabaseError);
@@ -36,8 +42,11 @@ const PrivateAdminRoute = ({ children }: PrivateAdminRouteProps) => {
           // Check if user is authenticated with Supabase
           const { data } = await supabase.auth.getSession();
           if (data.session) {
+            console.log("User authenticated with Supabase session");
             // User is authenticated with Supabase, mark as authorized
             setIsAuthorized(true);
+          } else {
+            console.log("No authentication found");
           }
         }
       } catch (error) {
@@ -49,7 +58,8 @@ const PrivateAdminRoute = ({ children }: PrivateAdminRouteProps) => {
       }
     };
     
-    checkAuth();
+    // Small delay to ensure localStorage has been set
+    setTimeout(checkAuth, 100);
   }, []);
   
   if (loading) {

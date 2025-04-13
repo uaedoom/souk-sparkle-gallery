@@ -26,27 +26,47 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Check Supabase session
-      const { data } = await supabase.auth.getSession();
-      const isSupabaseLoggedIn = !!data.session;
-      
-      // Check localStorage admin login
-      const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
-      
-      if (!isSupabaseLoggedIn && !isAdminLoggedIn) {
+      try {
+        // Check localStorage admin login first (more reliable)
+        const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+        
+        if (isAdminLoggedIn) {
+          console.log("Admin logged in via localStorage");
+          setLoading(false);
+          return;
+        }
+        
+        // If not logged in via localStorage, check Supabase session
+        const { data } = await supabase.auth.getSession();
+        const isSupabaseLoggedIn = !!data.session;
+        
+        if (isSupabaseLoggedIn) {
+          console.log("User logged in via Supabase");
+          setLoading(false);
+          return;
+        }
+        
+        // Neither auth method worked, redirect to login
+        console.log("No valid authentication found, redirecting to login");
         toast({
           title: "Access denied",
           description: "Please login to access the admin dashboard",
           variant: "destructive",
         });
         navigate("/admin");
-        return;
+      } catch (error) {
+        console.error("Auth check error:", error);
+        toast({
+          title: "Authentication error",
+          description: "Please try logging in again",
+          variant: "destructive",
+        });
+        navigate("/admin");
       }
-      
-      setLoading(false);
     };
     
-    checkAuth();
+    // Add a delay to ensure all auth processes have completed
+    setTimeout(checkAuth, 300);
     
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
