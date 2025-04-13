@@ -11,6 +11,9 @@ import Auth from "./pages/Auth";
 import ProductDetail from "./pages/ProductDetail";
 import TraderApplication from "./pages/TraderApplication";
 import AdminTraderApplications from "./pages/AdminTraderApplications";
+import Admin from "./pages/Admin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminHome from "./pages/AdminHome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,12 +26,23 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/traders" element={<Traders />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/apply-as-trader" element={<TraderApplication />} />
-            <Route path="/admin/trader-applications" element={<AdminTraderApplications />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />}>
+              <Route index element={<AdminHome />} />
+              <Route path="trader-applications" element={<AdminTraderApplications />} />
+              {/* Add more admin routes here */}
+            </Route>
+            {/* Remove the old direct path since it's now nested */}
+            {/* <Route path="/admin/trader-applications" element={<AdminTraderApplications />} /> */}
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
