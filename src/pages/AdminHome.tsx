@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, ShoppingBag, Calendar, TrendingUp, ImageIcon, Settings } from "lucide-react";
+import { Users, ShoppingBag, Calendar, TrendingUp, ImageIcon, Settings, Database } from "lucide-react";
 
 export default function AdminHome() {
   const [stats, setStats] = useState({
@@ -143,12 +143,12 @@ export default function AdminHome() {
               </div>
               <div className="flex items-center p-4 rounded-md bg-stone border border-gold/10">
                 <div className="mr-4 rounded-full p-2 bg-blue-500 bg-opacity-10">
-                  <ShoppingBag className="h-5 w-5 text-blue-500" />
+                  <Database className="h-5 w-5 text-blue-500" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Manage Products</h3>
+                  <h3 className="font-medium">Database Tables</h3>
                   <p className="text-sm text-luxury-light mt-1">
-                    Add, edit, or remove products from the marketplace through the Products section.
+                    Use the Database Tables section to view all data stored in your Supabase database.
                   </p>
                 </div>
               </div>
@@ -192,6 +192,13 @@ export default function AdminHome() {
                 <h3 className="font-medium">Upload Media</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Upload images and manage media files.
+                </p>
+              </Link>
+              <Link to="/admin/dashboard/tables" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+                <Database className="h-6 w-6 text-gold mb-2" />
+                <h3 className="font-medium">Database Tables</h3>
+                <p className="text-sm text-luxury-light mt-1">
+                  View all data from database tables.
                 </p>
               </Link>
               <Link to="/admin/dashboard/settings" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">

@@ -17,6 +17,7 @@ import AdminHome from "./pages/AdminHome";
 import AdminProducts from "./pages/AdminProducts";
 import AdminMedia from "./pages/AdminMedia";
 import AdminSettings from "./pages/AdminSettings";
+import AdminTables from "./pages/AdminTables";
 import NotFound from "./pages/NotFound";
 import PrivateAdminRoute from "./components/admin/PrivateAdminRoute";
 
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="products" element={<AdminProducts />} />
               <Route path="media" element={<AdminMedia />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="tables" element={<AdminTables />} />
             </Route>
             
             {/* Additional direct route for trader applications */}

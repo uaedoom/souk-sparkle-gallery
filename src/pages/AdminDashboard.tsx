@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  Loader2
+  Loader2,
+  Database
 } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -137,6 +138,7 @@ export default function AdminDashboard() {
             { name: "Trader Applications", icon: Users, path: "/admin/dashboard/trader-applications" },
             { name: "Products", icon: ShoppingBag, path: "/admin/dashboard/products" },
             { name: "Images & Media", icon: Image, path: "/admin/dashboard/media" },
+            { name: "Database Tables", icon: Database, path: "/admin/dashboard/tables" },
             { name: "Settings", icon: Settings, path: "/admin/dashboard/settings" }
           ].map((item) => (
             <Link
