@@ -1,11 +1,13 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { SearchIcon, ShoppingCartIcon, HeartIcon, UserIcon, MenuIcon, X } from "lucide-react";
+import { SearchIcon, ShoppingCartIcon, HeartIcon, UserIcon, MenuIcon, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <header className="bg-stone-dark/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gold/20 w-full">
@@ -29,18 +31,31 @@ export function Header() {
           <Button variant="ghost" size="icon" className="hover:bg-gold/10">
             <SearchIcon className="h-5 w-5 text-foreground" />
           </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-            <HeartIcon className="h-5 w-5 text-foreground" />
-          </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-            <ShoppingCartIcon className="h-5 w-5 text-foreground" />
-          </Button>
-          <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-            <UserIcon className="h-5 w-5 text-foreground" />
-          </Button>
-          <Button className="bg-gold hover:bg-gold-light text-stone-dark ml-4">
-            Sign In
-          </Button>
+          
+          {user ? (
+            <>
+              <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                <HeartIcon className="h-5 w-5 text-foreground" />
+              </Button>
+              <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                <ShoppingCartIcon className="h-5 w-5 text-foreground" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="hover:bg-gold/10 flex items-center gap-2" 
+                onClick={() => signOut()}
+              >
+                <LogOut className="h-5 w-5 text-foreground" />
+                <span>Logout</span>
+              </Button>
+            </>
+          ) : (
+            <Link to="/auth">
+              <Button className="bg-gold hover:bg-gold-light text-stone-dark ml-4">
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -70,19 +85,34 @@ export function Header() {
                 <Button variant="ghost" size="icon" className="hover:bg-gold/10">
                   <SearchIcon className="h-5 w-5 text-foreground" />
                 </Button>
-                <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-                  <HeartIcon className="h-5 w-5 text-foreground" />
-                </Button>
-                <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-                  <ShoppingCartIcon className="h-5 w-5 text-foreground" />
-                </Button>
-                <Button variant="ghost" size="icon" className="hover:bg-gold/10">
-                  <UserIcon className="h-5 w-5 text-foreground" />
-                </Button>
+                {user && (
+                  <>
+                    <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                      <HeartIcon className="h-5 w-5 text-foreground" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="hover:bg-gold/10">
+                      <ShoppingCartIcon className="h-5 w-5 text-foreground" />
+                    </Button>
+                  </>
+                )}
               </div>
-              <Button className="bg-gold hover:bg-gold-light text-stone-dark w-full">
-                Sign In
-              </Button>
+              
+              {user ? (
+                <Button 
+                  variant="outline" 
+                  className="border-gold/20 text-gold hover:bg-gold/10 w-full"
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </Button>
+              ) : (
+                <Link to="/auth" className="w-full">
+                  <Button className="bg-gold hover:bg-gold-light text-stone-dark w-full">
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </nav>
           </div>
         )}
