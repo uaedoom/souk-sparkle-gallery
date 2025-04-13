@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Traders from "./pages/Traders";
 import Auth from "./pages/Auth";
 import ProductDetail from "./pages/ProductDetail";
+import TraderApplication from "./pages/TraderApplication";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/traders" element={<Traders />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/apply-as-trader" element={<TraderApplication />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

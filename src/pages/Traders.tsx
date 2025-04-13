@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +83,7 @@ const tradersData = [
 ];
 
 const Traders = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
   
@@ -108,7 +110,10 @@ const Traders = () => {
             <p className="text-luxury-light text-lg mb-8">
               Connect with the finest gold, diamond, and precious stone traders from Dubai's legendary Gold Souk.
             </p>
-            <Button className="bg-gold hover:bg-gold-light text-stone-dark px-8 py-6 text-lg">
+            <Button 
+              className="bg-gold hover:bg-gold-light text-stone-dark px-8 py-6 text-lg"
+              onClick={() => navigate("/apply-as-trader")}
+            >
               Become a Trader
             </Button>
           </div>
@@ -224,7 +229,7 @@ const Traders = () => {
                     
                     <Button 
                       className="w-full bg-gold/10 hover:bg-gold/20 text-gold border border-gold/20"
-                      onClick={() => window.location.href = `/traders/${trader.id}`}
+                      onClick={() => navigate(`/traders/${trader.id}`)}
                     >
                       Visit Shop
                     </Button>
@@ -261,7 +266,10 @@ const Traders = () => {
           <p className="text-luxury-light max-w-2xl mx-auto mb-8">
             Join SoukSparkle's exclusive marketplace and connect with customers seeking premium gold, diamond, and stone products.
           </p>
-          <Button className="bg-gold hover:bg-gold-light text-stone-dark px-8 py-3">
+          <Button 
+            className="bg-gold hover:bg-gold-light text-stone-dark px-8 py-3"
+            onClick={() => navigate("/apply-as-trader")}
+          >
             Apply as a Trader
           </Button>
         </div>
