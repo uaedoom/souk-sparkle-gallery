@@ -15,53 +15,70 @@ export default function AdminHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        // Get total number of traders
-        const { count: tradersCount, error: tradersError } = await supabase
-          .from('traders')
-          .select('*', { count: 'exact', head: true });
-        
-        if (tradersError) console.error("Error fetching traders:", tradersError);
-        
-        // Get total number of applications
-        const { count: applicationsCount, error: applicationsError } = await supabase
-          .from('trader_applications')
-          .select('*', { count: 'exact', head: true });
-        
-        if (applicationsError) console.error("Error fetching applications:", applicationsError);
-        
-        // Get pending applications count
-        const { count: pendingCount, error: pendingError } = await supabase
-          .from('trader_applications')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'pending');
-        
-        if (pendingError) console.error("Error fetching pending applications:", pendingError);
-        
-        // Get total number of products
-        const { count: productsCount, error: productsError } = await supabase
-          .from('products')
-          .select('*', { count: 'exact', head: true });
-        
-        if (productsError) console.error("Error fetching products:", productsError);
-        
-        // Update stats with whatever data we successfully retrieved
-        setStats({
-          traders: tradersCount || 0,
-          applications: applicationsCount || 0,
-          products: productsCount || 0,
-          pendingApplications: pendingCount || 0
-        });
-      } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
+    // Fetch stats immediately on load
     fetchStats();
+    
+    // Also add a 1-second fallback refresh in case authentication takes time
+    const refreshTimer = setTimeout(() => {
+      if (stats.pendingApplications === 0) {
+        console.log("Refreshing stats after delay...");
+        fetchStats();
+      }
+    }, 1000);
+    
+    return () => clearTimeout(refreshTimer);
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      console.log("Fetching admin dashboard stats...");
+      
+      // Get total number of traders
+      const { data: tradersData, error: tradersError } = await supabase
+        .from('traders')
+        .select('id');
+      
+      if (tradersError) console.error("Error fetching traders:", tradersError);
+      
+      // Get all applications
+      const { data: applicationsData, error: applicationsError } = await supabase
+        .from('trader_applications')
+        .select('id, status');
+      
+      if (applicationsError) console.error("Error fetching applications:", applicationsError);
+      
+      // Get total number of products
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('id');
+      
+      if (productsError) console.error("Error fetching products:", productsError);
+      
+      // Calculate pending applications from the full data
+      const pendingApplications = applicationsData ? 
+        applicationsData.filter(app => app.status === 'pending').length : 0;
+      
+      console.log("Stats calculated:", {
+        traders: tradersData?.length || 0,
+        applications: applicationsData?.length || 0,
+        pendingApplications,
+        products: productsData?.length || 0
+      });
+      
+      // Update stats with whatever data we successfully retrieved
+      setStats({
+        traders: tradersData?.length || 0,
+        applications: applicationsData?.length || 0,
+        products: productsData?.length || 0,
+        pendingApplications
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
