@@ -102,10 +102,10 @@ export default function AdminDashboard() {
         <nav className="space-y-1">
           {[
             { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-            { name: "Trader Applications", icon: Users, path: "/admin/trader-applications" },
-            { name: "Products", icon: ShoppingBag, path: "/admin/products" },
-            { name: "Images & Media", icon: Image, path: "/admin/media" },
-            { name: "Settings", icon: Settings, path: "/admin/settings" }
+            { name: "Trader Applications", icon: Users, path: "/admin/dashboard/trader-applications" },
+            { name: "Products", icon: ShoppingBag, path: "/admin/dashboard/products" },
+            { name: "Images & Media", icon: Image, path: "/admin/dashboard/media" },
+            { name: "Settings", icon: Settings, path: "/admin/dashboard/settings" }
           ].map((item) => (
             <Link
               key={item.name}
