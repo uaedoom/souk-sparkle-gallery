@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, ShoppingBag, Calendar, TrendingUp, ImageIcon, Settings } from "lucide-react";
@@ -131,34 +132,34 @@ export default function AdminHome() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              <Link to="/admin/trader-applications" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <Users className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Manage Traders</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Review and approve pending trader applications.
                 </p>
-              </div>
-              <div className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              </Link>
+              <Link to="/admin/products" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <ShoppingBag className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Manage Products</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Add, edit or remove products from the marketplace.
                 </p>
-              </div>
-              <div className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              </Link>
+              <Link to="/admin/media" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <ImageIcon className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Upload Media</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Upload images and manage media files.
                 </p>
-              </div>
-              <div className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              </Link>
+              <Link to="/admin/settings" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <Settings className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Settings</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Configure site settings and preferences.
                 </p>
-              </div>
+              </Link>
             </div>
           </CardContent>
         </Card>

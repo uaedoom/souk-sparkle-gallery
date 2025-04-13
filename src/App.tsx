@@ -14,6 +14,9 @@ import AdminTraderApplications from "./pages/AdminTraderApplications";
 import Admin from "./pages/Admin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminHome from "./pages/AdminHome";
+import AdminProducts from "./pages/AdminProducts";
+import AdminMedia from "./pages/AdminMedia";
+import AdminSettings from "./pages/AdminSettings";
 import NotFound from "./pages/NotFound";
 import PrivateAdminRoute from "./components/admin/PrivateAdminRoute";
 
@@ -43,10 +46,10 @@ const App = () => (
             }>
               <Route index element={<AdminHome />} />
               <Route path="trader-applications" element={<AdminTraderApplications />} />
-              {/* Add more admin routes here */}
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="media" element={<AdminMedia />} />
+              <Route path="settings" element={<AdminSettings />} />
             </Route>
-            {/* Remove the old direct path since it's now nested */}
-            {/* <Route path="/admin/trader-applications" element={<AdminTraderApplications />} /> */}
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
