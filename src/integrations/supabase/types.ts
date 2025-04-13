@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admins: {
+        Row: {
+          created_at: string
+          id: string
+          is_super_admin: boolean | null
+          updated_at: string
+          user_id: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_super_admin?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_super_admin?: boolean | null
+          updated_at?: string
+          user_id?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: Database["public"]["Enums"]["product_category_enum"]

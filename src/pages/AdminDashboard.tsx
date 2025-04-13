@@ -84,17 +84,26 @@ export default function AdminDashboard() {
   }, [navigate, toast]);
 
   const handleSignOut = async () => {
-    // Clear admin login state from localStorage
-    localStorage.removeItem("adminLoggedIn");
-    
-    // Sign out from Supabase
-    await supabase.auth.signOut();
-    
-    toast({
-      title: "Signed out",
-      description: "You have been signed out of the admin dashboard",
-    });
-    navigate("/admin");
+    try {
+      // Clear admin login state from localStorage (legacy support)
+      localStorage.removeItem("adminLoggedIn");
+      
+      // Sign out from Supabase
+      await supabase.auth.signOut();
+      
+      toast({
+        title: "Signed out",
+        description: "You have been signed out of the admin dashboard",
+      });
+      navigate("/admin");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error signing out",
+        description: "An error occurred while trying to sign out",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {

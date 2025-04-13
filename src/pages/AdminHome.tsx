@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Users, ShoppingBag, Calendar, TrendingUp, ImageIcon, Settings, Database } from "lucide-react";
+import AdminProfile from "@/components/admin/AdminProfile";
 
 export default function AdminHome() {
   const [stats, setStats] = useState({
@@ -83,7 +84,9 @@ export default function AdminHome() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold gold-gradient mb-4">Dashboard Overview</h1>
-      <p className="text-luxury-light mb-6">Welcome to your SoukSparkle admin control center. View key statistics and access important features.</p>
+      <p className="text-luxury-light mb-4">Welcome to your SoukSparkle admin control center. View key statistics and access important features.</p>
+      
+      <AdminProfile />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
