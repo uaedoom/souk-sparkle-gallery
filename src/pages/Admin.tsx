@@ -5,50 +5,93 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2, User, Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 // Hardcoded admin credentials
 const ADMIN_USERNAME = "admin";
 const ADMIN_PASSWORD = "admin";
+// For Supabase auth (this email doesn't need to exist)
+const ADMIN_EMAIL = "admin@souksparkle.com";
 
 export default function Admin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if admin is already logged in
-    const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
-    if (isAdminLoggedIn) {
-      navigate("/admin/dashboard");
-    }
+    const checkAuth = async () => {
+      // Check if admin is already logged in via localStorage (legacy)
+      const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+      
+      // Check if user is authenticated with Supabase
+      const { data } = await supabase.auth.getSession();
+      
+      if (isAdminLoggedIn || data.session) {
+        navigate("/admin/dashboard");
+      }
+      
+      setCheckingSession(false);
+    };
+    
+    checkAuth();
   }, [navigate]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Simple credential check
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Set admin as logged in
-      localStorage.setItem("adminLoggedIn", "true");
-      
+    try {
+      // Simple credential check for admin
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        // Set admin as logged in via localStorage (legacy)
+        localStorage.setItem("adminLoggedIn", "true");
+        
+        // Also sign in with Supabase for RLS access
+        await supabase.auth.signInWithPassword({
+          email: ADMIN_EMAIL,
+          password: ADMIN_PASSWORD
+        });
+        
+        toast({
+          title: "Admin login successful",
+          description: "Welcome to the admin dashboard",
+        });
+        
+        navigate("/admin/dashboard");
+      } else {
+        // Try to sign in user with Supabase (for regular users who are traders)
+        const { error } = await supabase.auth.signInWithPassword({
+          email: username, // Assuming username is an email
+          password: password
+        });
+        
+        if (error) {
+          toast({
+            title: "Access denied",
+            description: "Invalid credentials",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login successful",
+            description: "Welcome to the admin dashboard",
+          });
+          
+          navigate("/admin/dashboard");
+        }
+      }
+    } catch (error) {
       toast({
-        title: "Admin login successful",
-        description: "Welcome to the admin dashboard",
-      });
-      
-      navigate("/admin/dashboard");
-    } else {
-      toast({
-        title: "Access denied",
-        description: "Invalid admin credentials",
+        title: "Error signing in",
+        description: "An error occurred while trying to sign in",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (

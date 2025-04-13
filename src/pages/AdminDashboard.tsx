@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, Outlet } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
   Users,
@@ -24,21 +25,29 @@ export default function AdminDashboard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if admin is logged in
-    const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+    const checkAuth = async () => {
+      // Check Supabase session
+      const { data } = await supabase.auth.getSession();
+      const isSupabaseLoggedIn = !!data.session;
+      
+      // Check localStorage admin login
+      const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+      
+      if (!isSupabaseLoggedIn && !isAdminLoggedIn) {
+        toast({
+          title: "Access denied",
+          description: "Please login to access the admin dashboard",
+          variant: "destructive",
+        });
+        navigate("/admin");
+        return;
+      }
+      
+      setLoading(false);
+    };
     
-    if (!isAdminLoggedIn) {
-      toast({
-        title: "Access denied",
-        description: "Please login to access the admin dashboard",
-        variant: "destructive",
-      });
-      navigate("/admin");
-      return;
-    }
+    checkAuth();
     
-    setLoading(false);
-
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
@@ -53,9 +62,12 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('resize', handleResize);
   }, [navigate, toast]);
 
-  const handleSignOut = () => {
-    // Clear admin login state
+  const handleSignOut = async () => {
+    // Clear admin login state from localStorage
     localStorage.removeItem("adminLoggedIn");
+    
+    // Sign out from Supabase
+    await supabase.auth.signOut();
     
     toast({
       title: "Signed out",
