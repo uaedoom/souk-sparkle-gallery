@@ -24,6 +24,9 @@ export function Header() {
           <Link to="/diamonds" className="text-foreground hover-gold font-medium">Diamonds</Link>
           <Link to="/stones" className="text-foreground hover-gold font-medium">Stones</Link>
           <Link to="/traders" className="text-foreground hover-gold font-medium">Traders</Link>
+          {user && (
+            <Link to="/admin/trader-applications" className="text-foreground hover-gold font-medium">Admin</Link>
+          )}
         </nav>
 
         {/* Desktop Action Buttons */}
@@ -81,6 +84,9 @@ export function Header() {
               <Link to="/diamonds" className="text-foreground hover-gold py-2">Diamonds</Link>
               <Link to="/stones" className="text-foreground hover-gold py-2">Stones</Link>
               <Link to="/traders" className="text-foreground hover-gold py-2">Traders</Link>
+              {user && (
+                <Link to="/admin/trader-applications" className="text-foreground hover-gold py-2">Admin</Link>
+              )}
               <div className="flex items-center space-x-4 py-2">
                 <Button variant="ghost" size="icon" className="hover:bg-gold/10">
                   <SearchIcon className="h-5 w-5 text-foreground" />

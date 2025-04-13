@@ -9,7 +9,196 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          category: Database["public"]["Enums"]["product_category_enum"]
+          created_at: string
+          currency: string
+          description: string | null
+          featured: boolean
+          id: string
+          image_url: string | null
+          in_stock: boolean
+          name: string
+          price: number
+          specs: Json | null
+          trader_id: string
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["product_category_enum"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          in_stock?: boolean
+          name: string
+          price: number
+          specs?: Json | null
+          trader_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["product_category_enum"]
+          created_at?: string
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          id?: string
+          image_url?: string | null
+          in_stock?: boolean
+          name?: string
+          price?: number
+          specs?: Json | null
+          trader_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_trader_id_fkey"
+            columns: ["trader_id"]
+            isOneToOne: false
+            referencedRelation: "traders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trader_applications: {
+        Row: {
+          business_description: string
+          business_name: string
+          contact_email: string
+          contact_phone: string
+          created_at: string
+          id: string
+          physical_location: string
+          product_category: Database["public"]["Enums"]["product_category_enum"]
+          specialty: string
+          status: Database["public"]["Enums"]["application_status_enum"]
+          updated_at: string
+          user_id: string
+          website: string | null
+          years_experience: number
+        }
+        Insert: {
+          business_description: string
+          business_name: string
+          contact_email: string
+          contact_phone: string
+          created_at?: string
+          id?: string
+          physical_location: string
+          product_category: Database["public"]["Enums"]["product_category_enum"]
+          specialty: string
+          status?: Database["public"]["Enums"]["application_status_enum"]
+          updated_at?: string
+          user_id: string
+          website?: string | null
+          years_experience?: number
+        }
+        Update: {
+          business_description?: string
+          business_name?: string
+          contact_email?: string
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          physical_location?: string
+          product_category?: Database["public"]["Enums"]["product_category_enum"]
+          specialty?: string
+          status?: Database["public"]["Enums"]["application_status_enum"]
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+          years_experience?: number
+        }
+        Relationships: []
+      }
+      traders: {
+        Row: {
+          banner_url: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          established_date: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          physical_location: string | null
+          rating: number | null
+          specialty: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          banner_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          established_date?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          physical_location?: string | null
+          rating?: number | null
+          specialty?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          banner_url?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          established_date?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          physical_location?: string | null
+          rating?: number | null
+          specialty?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      wishlist_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +207,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      application_status_enum: "pending" | "approved" | "rejected"
+      product_category_enum:
+        | "Gold Jewelry"
+        | "Silver Jewelry"
+        | "Diamond Jewelry"
+        | "Gemstone Jewelry"
+        | "Watches"
+        | "Custom Designs"
+        | "Other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +330,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      application_status_enum: ["pending", "approved", "rejected"],
+      product_category_enum: [
+        "Gold Jewelry",
+        "Silver Jewelry",
+        "Diamond Jewelry",
+        "Gemstone Jewelry",
+        "Watches",
+        "Custom Designs",
+        "Other",
+      ],
+    },
   },
 } as const
