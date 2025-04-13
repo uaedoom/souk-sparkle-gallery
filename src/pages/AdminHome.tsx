@@ -22,14 +22,14 @@ export default function AdminHome() {
           .from('traders')
           .select('*', { count: 'exact', head: true });
         
-        if (tradersError) throw tradersError;
+        if (tradersError) console.error("Error fetching traders:", tradersError);
         
         // Get total number of applications
         const { count: applicationsCount, error: applicationsError } = await supabase
           .from('trader_applications')
           .select('*', { count: 'exact', head: true });
         
-        if (applicationsError) throw applicationsError;
+        if (applicationsError) console.error("Error fetching applications:", applicationsError);
         
         // Get pending applications count
         const { count: pendingCount, error: pendingError } = await supabase
@@ -37,15 +37,16 @@ export default function AdminHome() {
           .select('*', { count: 'exact', head: true })
           .eq('status', 'pending');
         
-        if (pendingError) throw pendingError;
+        if (pendingError) console.error("Error fetching pending applications:", pendingError);
         
         // Get total number of products
         const { count: productsCount, error: productsError } = await supabase
           .from('products')
           .select('*', { count: 'exact', head: true });
         
-        if (productsError) throw productsError;
+        if (productsError) console.error("Error fetching products:", productsError);
         
+        // Update stats with whatever data we successfully retrieved
         setStats({
           traders: tradersCount || 0,
           applications: applicationsCount || 0,
@@ -64,7 +65,8 @@ export default function AdminHome() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+      <h1 className="text-3xl font-bold gold-gradient mb-4">Dashboard Overview</h1>
+      <p className="text-luxury-light mb-6">Welcome to your SoukSparkle admin control center. View key statistics and access important features.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
@@ -99,28 +101,50 @@ export default function AdminHome() {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle>Recent Activity</CardTitle>
+            <Link to="/admin/dashboard/trader-applications" className="text-sm text-gold hover:underline">
+              View all
+            </Link>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-4">
               Welcome to the SoukSparkle admin dashboard. From here, you can manage trader applications, 
               products, and site content. Use the navigation sidebar to access different sections.
             </p>
-            <div className="mt-4 space-y-4">
-              <div className="p-4 rounded-md bg-stone">
-                <h3 className="font-medium">Getting Started</h3>
-                <p className="text-sm text-luxury-light mt-1">
-                  Check the "Trader Applications" section to review and approve new trader applications.
-                  Approved traders will be automatically added to the marketplace.
-                </p>
+            <div className="space-y-4">
+              <div className="flex items-center p-4 rounded-md bg-stone border border-gold/10">
+                <div className="mr-4 rounded-full p-2 bg-amber-500 bg-opacity-10">
+                  <Calendar className="h-5 w-5 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium">New Trader Applications</h3>
+                  <p className="text-sm text-luxury-light mt-1">
+                    Check the "Trader Applications" section to review and approve pending applications.
+                  </p>
+                </div>
               </div>
-              <div className="p-4 rounded-md bg-stone">
-                <h3 className="font-medium">What's New</h3>
-                <p className="text-sm text-luxury-light mt-1">
-                  This admin dashboard allows you to manage all aspects of your SoukSparkle marketplace.
-                  More features will be added in future updates.
-                </p>
+              <div className="flex items-center p-4 rounded-md bg-stone border border-gold/10">
+                <div className="mr-4 rounded-full p-2 bg-blue-500 bg-opacity-10">
+                  <ShoppingBag className="h-5 w-5 text-blue-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Manage Products</h3>
+                  <p className="text-sm text-luxury-light mt-1">
+                    Add, edit, or remove products from the marketplace through the Products section.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center p-4 rounded-md bg-stone border border-gold/10">
+                <div className="mr-4 rounded-full p-2 bg-emerald-500 bg-opacity-10">
+                  <Settings className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Configure Settings</h3>
+                  <p className="text-sm text-luxury-light mt-1">
+                    Customize your marketplace settings and preferences in the Settings section.
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -132,28 +156,28 @@ export default function AdminHome() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link to="/admin/trader-applications" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              <Link to="/admin/dashboard/trader-applications" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <Users className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Manage Traders</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Review and approve pending trader applications.
                 </p>
               </Link>
-              <Link to="/admin/products" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              <Link to="/admin/dashboard/products" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <ShoppingBag className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Manage Products</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Add, edit or remove products from the marketplace.
                 </p>
               </Link>
-              <Link to="/admin/media" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              <Link to="/admin/dashboard/media" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <ImageIcon className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Upload Media</h3>
                 <p className="text-sm text-luxury-light mt-1">
                   Upload images and manage media files.
                 </p>
               </Link>
-              <Link to="/admin/settings" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
+              <Link to="/admin/dashboard/settings" className="p-4 rounded-md bg-stone border border-gold/20 hover:border-gold transition-colors cursor-pointer">
                 <Settings className="h-6 w-6 text-gold mb-2" />
                 <h3 className="font-medium">Settings</h3>
                 <p className="text-sm text-luxury-light mt-1">
@@ -177,8 +201,20 @@ interface StatCardProps {
 }
 
 function StatCard({ title, value, icon: Icon, color, loading }: StatCardProps) {
-  return (
-    <Card>
+  // Determine link based on title
+  let link = "";
+  if (title.includes("Traders")) {
+    link = "/admin/dashboard/trader-applications";
+  } else if (title.includes("Products")) {
+    link = "/admin/dashboard/products";
+  } else if (title.includes("Applications")) {
+    link = "/admin/dashboard/trader-applications";
+  } else if (title.includes("Media")) {
+    link = "/admin/dashboard/media";
+  }
+
+  const card = (
+    <Card className={link ? "cursor-pointer hover:shadow-md transition-shadow" : ""}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -194,4 +230,10 @@ function StatCard({ title, value, icon: Icon, color, loading }: StatCardProps) {
       </CardContent>
     </Card>
   );
+
+  if (link) {
+    return <Link to={link}>{card}</Link>;
+  }
+  
+  return card;
 }
