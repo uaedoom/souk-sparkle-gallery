@@ -51,6 +51,13 @@ const App = () => (
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
+            {/* Additional direct route for trader applications */}
+            <Route path="/admin/trader-applications" element={
+              <PrivateAdminRoute>
+                <AdminTraderApplications />
+              </PrivateAdminRoute>
+            } />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
