@@ -15,6 +15,7 @@ import Admin from "./pages/Admin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminHome from "./pages/AdminHome";
 import NotFound from "./pages/NotFound";
+import PrivateAdminRoute from "./components/admin/PrivateAdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +36,11 @@ const App = () => (
             
             {/* Admin Routes */}
             <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/dashboard" element={<AdminDashboard />}>
+            <Route path="/admin/dashboard" element={
+              <PrivateAdminRoute>
+                <AdminDashboard />
+              </PrivateAdminRoute>
+            }>
               <Route index element={<AdminHome />} />
               <Route path="trader-applications" element={<AdminTraderApplications />} />
               {/* Add more admin routes here */}

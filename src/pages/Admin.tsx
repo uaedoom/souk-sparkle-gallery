@@ -2,101 +2,54 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, User, Lock } from "lucide-react";
 
-// This is temporary until we have proper role management
-// Replace this with the admin email that should have access
-const ADMIN_EMAIL = "admin@example.com"; 
+// Hardcoded admin credentials
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "admin";
 
 export default function Admin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [checkingStatus, setCheckingStatus] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      try {
-        const { data: session } = await supabase.auth.getSession();
-        
-        if (!session.session) {
-          setCheckingStatus(false);
-          return;
-        }
-        
-        // Check if user email matches admin email
-        if (session.session.user.email === ADMIN_EMAIL) {
-          setIsAdmin(true);
-          navigate("/admin/dashboard");
-        }
-      } catch (error) {
-        console.error("Error checking admin status:", error);
-      } finally {
-        setCheckingStatus(false);
-      }
-    };
-    
-    checkAdminStatus();
+    // Check if admin is already logged in
+    const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
+    if (isAdminLoggedIn) {
+      navigate("/admin/dashboard");
+    }
   }, [navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    // Simple credential check
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Set admin as logged in
+      localStorage.setItem("adminLoggedIn", "true");
+      
+      toast({
+        title: "Admin login successful",
+        description: "Welcome to the admin dashboard",
       });
       
-      if (error) throw error;
-      
-      // Check if the user is an admin by email
-      if (data.user?.email === ADMIN_EMAIL) {
-        toast({
-          title: "Admin login successful",
-          description: "Welcome to the admin dashboard",
-        });
-        navigate("/admin/dashboard");
-      } else {
-        await supabase.auth.signOut();
-        toast({
-          title: "Access denied",
-          description: "You do not have admin privileges",
-          variant: "destructive",
-        });
-      }
-    } catch (error: any) {
+      navigate("/admin/dashboard");
+    } else {
       toast({
-        title: "Login error",
-        description: error.message,
+        title: "Access denied",
+        description: "Invalid admin credentials",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
-
-  if (checkingStatus) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-stone-dark">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-gold" />
-          <p className="mt-4 text-luxury-light">Checking admin access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isAdmin) {
-    return null; // Will be redirected to dashboard
-  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-stone-dark">
@@ -111,17 +64,17 @@ export default function Admin() {
         <form onSubmit={handleLogin} className="mt-8 space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm text-luxury-light mb-1">
-                Email Address
+              <label htmlFor="username" className="block text-sm text-luxury-light mb-1">
+                Username
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-luxury-light" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-luxury-light" />
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter admin username"
                   className="pl-10 bg-stone border-gold/20 focus:border-gold"
                   required
                 />
@@ -139,7 +92,7 @@ export default function Admin() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Enter admin password"
                   className="pl-10 bg-stone border-gold/20 focus:border-gold"
                   required
                 />

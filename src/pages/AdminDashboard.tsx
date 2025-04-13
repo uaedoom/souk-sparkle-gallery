@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, Outlet } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -17,9 +16,6 @@ import {
   Loader2
 } from "lucide-react";
 
-// This is temporary until we have proper role management
-const ADMIN_EMAIL = "admin@example.com";
-
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
@@ -28,34 +24,20 @@ export default function AdminDashboard() {
   const { toast } = useToast();
 
   useEffect(() => {
-    const checkAdminAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-          navigate("/admin");
-          return;
-        }
-        
-        // Check if user email matches admin email
-        if (session.user.email !== ADMIN_EMAIL) {
-          toast({
-            title: "Access denied",
-            description: "You do not have admin privileges",
-            variant: "destructive",
-          });
-          navigate("/admin");
-          return;
-        }
-      } catch (error) {
-        console.error("Error checking admin authentication:", error);
-        navigate("/admin");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Check if admin is logged in
+    const isAdminLoggedIn = localStorage.getItem("adminLoggedIn") === "true";
     
-    checkAdminAuth();
+    if (!isAdminLoggedIn) {
+      toast({
+        title: "Access denied",
+        description: "Please login to access the admin dashboard",
+        variant: "destructive",
+      });
+      navigate("/admin");
+      return;
+    }
+    
+    setLoading(false);
 
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
@@ -71,8 +53,10 @@ export default function AdminDashboard() {
     return () => window.removeEventListener('resize', handleResize);
   }, [navigate, toast]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = () => {
+    // Clear admin login state
+    localStorage.removeItem("adminLoggedIn");
+    
     toast({
       title: "Signed out",
       description: "You have been signed out of the admin dashboard",
