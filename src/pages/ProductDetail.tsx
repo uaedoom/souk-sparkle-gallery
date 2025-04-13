@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, ShoppingCart, Star, ChevronRight, Info, Shield, Certificate } from "lucide-react";
+import { Heart, Share2, ShoppingCart, Star, ChevronRight, Info, Shield, Award } from "lucide-react";
 
 // Sample product data - in a real app, this would come from an API
 const productData = {
@@ -146,7 +146,7 @@ const ProductDetail = () => {
               <div className="space-y-4 border-t border-gold/10 pt-6">
                 <div className="flex items-start">
                   <div className="bg-gold/10 p-2 rounded-full mr-4">
-                    <Certificate className="h-5 w-5 text-gold" />
+                    <Award className="h-5 w-5 text-gold" />
                   </div>
                   <div>
                     <h4 className="font-medium">Authenticity Certificate</h4>
